@@ -28,6 +28,7 @@ There is no seed script: open http://localhost:3000/forms/new and create a form.
 When you change `prisma/schema.prisma` later, use `npx prisma migrate dev --create-only --name <name>`,
 review the SQL, then `npx prisma migrate dev` (see "Key ideas" below).
 
+- `npm run typecheck` generates Next.js route types (`next typegen`) and runs `tsc`.
 - `npm test` runs the Vitest unit tests for `formDefinitionSchema` and `buildZodSchema`.
 - `npm run smoke` runs an end-to-end API check against the running dev server
   (create, versions, publish, submit, concurrent publish rejection, archive).
