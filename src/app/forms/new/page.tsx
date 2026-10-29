@@ -1,20 +1,17 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FormBuilder } from "@/components/builder/form-builder";
-import { newFieldId, type FormDefinition } from "@/forms/definition";
-import { fieldRegistry } from "@/forms/field-registry";
+import type { FormDefinition } from "@/forms/definition";
 import { trpc } from "@/trpc/client";
+
+// No starter field: field ids are random, and generating one during render
+// would differ between the server HTML and the client.
+const initial: FormDefinition = { schemaVersion: 1, title: "Untitled form", fields: [] };
 
 export default function NewFormPage() {
   const router = useRouter();
   const create = trpc.form.create.useMutation();
-  const [initial] = useState<FormDefinition>(() => ({
-    schemaVersion: 1,
-    title: "Untitled form",
-    fields: [{ ...fieldRegistry.text.create(newFieldId()), label: "Name" }],
-  }));
 
   return (
     <div className="space-y-6">
