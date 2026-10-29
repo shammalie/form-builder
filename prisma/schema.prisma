@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Form {
+  id         String        @id @default(cuid())
+  title      String // denormalized from latest version, for listing
+  archivedAt DateTime? // soft delete: null = active
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  versions   FormVersion[]
+}
+
+model FormVersion {
+  id          String       @id @default(cuid())
+  formId      String
+  version     Int // 1, 2, 3 ... per form
+  definition  Json // FormDefinition, validated before insert
+  published   Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  form        Form         @relation(fields: [formId], references: [id], onDelete: Cascade)
+  submissions Submission[]
+
+  @@unique([formId, version])
+  // + partial unique index "FormVersion_one_published_per_form" (raw SQL migration)
+}
+
+model Submission {
+  id            String      @id @default(cuid())
+  formVersionId String
+  data          Json // validated answers, keyed by field id
+  createdAt     DateTime    @default(now())
+  formVersion   FormVersion @relation(fields: [formVersionId], references: [id], onDelete: Restrict)
+
+  @@index([formVersionId])
+}
