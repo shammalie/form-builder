@@ -7,12 +7,26 @@ Stack: Next.js (App Router) + tRPC v11 + TanStack Query + Prisma/Postgres + Reac
 
 ## Run locally
 
+Requirements:
+
+- Node.js 22 (see `.nvmrc`; `nvm use` picks it up). Node 20.9+ also works with Next.js 16.
+- PostgreSQL 14+ running locally. Either of these works:
+  - Docker: `docker run -d --name formbuilder-db -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=formbuilder -p 5432:5432 postgres:16`
+  - Installed Postgres: `createdb formbuilder` (and adjust the user/password in `.env`)
+
+Steps:
+
 ```bash
-cp .env.example .env            # point DATABASE_URL at a local Postgres
-npm install
-npx prisma migrate dev          # includes the partial unique index migration
+cp .env.example .env            # edit DATABASE_URL if your Postgres user/password/port differ
+npm install                     # also generates the Prisma client
+npx prisma migrate deploy       # applies all migrations, including the partial unique index
 npm run dev                     # http://localhost:3000
 ```
+
+There is no seed script: open http://localhost:3000/forms/new and create a form.
+
+When you change `prisma/schema.prisma` later, use `npx prisma migrate dev --create-only --name <name>`,
+review the SQL, then `npx prisma migrate dev` (see "Key ideas" below).
 
 - `npm test` runs the Vitest unit tests for `formDefinitionSchema` and `buildZodSchema`.
 - `npm run smoke` runs an end-to-end API check against the running dev server
